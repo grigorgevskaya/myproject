@@ -1,7 +1,7 @@
 import argparse
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
-from db_session import engine
+from .db_session import engine
 
 Base = declarative_base()
 
