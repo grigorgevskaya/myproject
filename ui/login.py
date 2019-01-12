@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, QTextEdit,
                              QDialog, QFormLayout, QToolTip, QMessageBox, QDesktopWidget)
 from PyQt5.QtCore import pyqtSlot
 
-
+from prj_utils.db_session import session
+from prj_utils.models import User
 
 class LoginWindow(QWidget, QGridLayout):
 
@@ -66,8 +67,25 @@ class LoginWindow(QWidget, QGridLayout):
     def login_btn_method(self):
         login_textbox_Value = self.textbox_login.text()
         password_textbox_Value = self.textbox_password.text()
-        QMessageBox.question(self, '!ВНИМАНИЕ!', f"Вы ввели следующее в поле логина:\
-         {login_textbox_Value} и пароля {password_textbox_Value}", QMessageBox.Ok, QMessageBox.Ok)
+        user = session.query(User).filter(username=login_textbox_Value).count()
+        if user == 0:
+            QMessageBox.question(self, '!ВНИМАНИЕ!', f"Вы ввели неправильное имя пользователя или пароль")
+            self.textbox_login.setText("")
+            self.textbox_password.setText("")
+        else:
+            user = session.query(User).filter(username=login_textbox_Value)
+            is_password_right = user.password == password_textbox_Value
+            if is_password_right:
+                QMessageBox.question(self, '!ПРИВЕТСТВУЮ!', f"Пользователь {login_textbox_Value}!")
+                self.textbox_login.setText("")
+                self.textbox_password.setText("")
+            else:
+                QMessageBox.question(self, '!ВНИМАНИЕ!', f"Вы ввели неправильное имя пользователя или пароль")
+                self.textbox_login.setText("")
+                self.textbox_password.setText("")
+
+        # QMessageBox.question(self, '!ВНИМАНИЕ!', f"Вы ввели следующее в поле логина:\
+        #  {login_textbox_Value} и пароля {password_textbox_Value}", QMessageBox.Ok, QMessageBox.Ok)
         self.textbox_login.setText("")
         self.textbox_password.setText("")
 
